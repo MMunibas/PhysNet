@@ -7,7 +7,7 @@ Tensorflow implementation of PhysNet (see https://arxiv.org/abs/1902.08408) for 
 To run this software, you need:
 
 - python3 (tested with version 3.6.3)
-- tensorflow (tested with version 1.10.1)
+- TensorFlow (tested with version 1.10.1)
 
 
 
@@ -24,11 +24,7 @@ python3 train.py
 
 in a terminal to start training. 
 
-The included "config.txt" assumes that the dataset "sn2_reactions.npz" is present. 
-It can be downloaded from: https://zenodo.org/record/2605341
-In order to use a different dataset, it needs to be formatted in the same way as
-this example ("sn2_reactions.npz"). Please refer to the README file of the dataset
-(available from https://zenodo.org/record/2605341) for details.
+The included "config.txt" assumes that the dataset "sn2_reactions.npz" is present. It can be downloaded from: https://zenodo.org/record/2605341. In order to use a different dataset, it needs to be formatted in the same way as this example ("sn2_reactions.npz"). Please refer to the README file of the dataset (available from https://zenodo.org/record/2605341) for details.
 
 
 ## How to cite
