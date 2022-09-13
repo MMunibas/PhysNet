@@ -1,7 +1,8 @@
 import tensorflow as tf
-from .NeuronLayer      import *
+from .NeuronLayer import *
 from .InteractionLayer import *
-from .ResidualLayer    import *
+from .ResidualLayer import *
+
 
 class InteractionBlock(NeuronLayer):
     def __str__(self):
@@ -10,20 +11,24 @@ class InteractionBlock(NeuronLayer):
     def __init__(self, K, F, num_residual_atomic, num_residual_interaction, activation_fn=None, seed=None, scope=None, keep_prob=1.0, dtype=tf.float32):
         super().__init__(K, F, activation_fn)
         with tf.variable_scope(scope):
-            #interaction layer
-            self._interaction = InteractionLayer(K, F, num_residual_interaction, activation_fn=activation_fn, seed=seed, scope="interaction_layer", keep_prob=keep_prob, dtype=dtype)
+            # interaction layer
+            self._interaction = InteractionLayer(K, F, num_residual_interaction, activation_fn=activation_fn,
+                                                 seed=seed, scope="interaction_layer", keep_prob=keep_prob, dtype=dtype)
 
-            #residual layers
+            # residual layers
             self._residual_layer = []
             for i in range(num_residual_atomic):
-                self._residual_layer.append(ResidualLayer(F, F, activation_fn, seed=seed, scope="residual_layer"+str(i), keep_prob=keep_prob, dtype=dtype))
+                self._residual_layer.append(ResidualLayer(
+                    F, F, activation_fn, seed=seed, scope="residual_layer"+str(i), keep_prob=keep_prob, dtype=dtype))
 
     @property
     def interaction(self):
+        '''interaction getter'''
         return self._interaction
-    
+
     @property
     def residual_layer(self):
+        '''residual_layer getter'''
         return self._residual_layer
 
     def __call__(self, x, rbf, idx_i, idx_j):

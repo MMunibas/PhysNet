@@ -12,7 +12,10 @@ from tensorflow.python.ops import state_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.training import optimizer
 
+
 class AMSGrad(optimizer.Optimizer):
+    '''Implementation of AMSGrad, an improvement on Adam optimizer'''
+
     def __init__(self, learning_rate=0.001, beta1=0.9, beta2=0.99, epsilon=1e-3, use_locking=False, name="AMSGrad"):
         super(AMSGrad, self).__init__(use_locking, name)
         self._lr = learning_rate
@@ -32,15 +35,17 @@ class AMSGrad(optimizer.Optimizer):
         first_var = min(var_list, key=lambda x: x.name)
 
         create_new = self._beta1_power is None
-        #if not create_new and context.in_graph_mode():
+        # if not create_new and context.in_graph_mode():
         #    create_new = (self._beta1_power.graph is not first_var.graph)
 
         if create_new:
             with ops.colocate_with(first_var):
-                self._beta1_power = variable_scope.variable(self._beta1, name="beta1_power", trainable=False)
-                self._beta2_power = variable_scope.variable(self._beta2, name="beta2_power", trainable=False)
+                self._beta1_power = variable_scope.variable(
+                    self._beta1, name="beta1_power", trainable=False)
+                self._beta2_power = variable_scope.variable(
+                    self._beta2, name="beta2_power", trainable=False)
         # Create slots for the first and second moments.
-        for v in var_list :
+        for v in var_list:
             self._zeros_slot(v, "m", self._name)
             self._zeros_slot(v, "v", self._name)
             self._zeros_slot(v, "vhat", self._name)
@@ -64,19 +69,22 @@ class AMSGrad(optimizer.Optimizer):
         # m_t = beta1 * m + (1 - beta1) * g_t
         m = self.get_slot(var, "m")
         m_scaled_g_values = grad * (1 - beta1_t)
-        m_t = state_ops.assign(m, beta1_t * m + m_scaled_g_values, use_locking=self._use_locking)
+        m_t = state_ops.assign(
+            m, beta1_t * m + m_scaled_g_values, use_locking=self._use_locking)
 
         # v_t = beta2 * v + (1 - beta2) * (g_t * g_t)
         v = self.get_slot(var, "v")
         v_scaled_g_values = (grad * grad) * (1 - beta2_t)
-        v_t = state_ops.assign(v, beta2_t * v + v_scaled_g_values, use_locking=self._use_locking)
+        v_t = state_ops.assign(
+            v, beta2_t * v + v_scaled_g_values, use_locking=self._use_locking)
 
         # amsgrad
         vhat = self.get_slot(var, "vhat")
         vhat_t = state_ops.assign(vhat, math_ops.maximum(v_t, vhat))
         v_sqrt = math_ops.sqrt(vhat_t)
 
-        var_update = state_ops.assign_sub(var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
+        var_update = state_ops.assign_sub(
+            var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
         return control_flow_ops.group(*[var_update, m_t, v_t, vhat_t])
 
     def _resource_apply_dense(self, grad, var):
@@ -93,19 +101,22 @@ class AMSGrad(optimizer.Optimizer):
         # m_t = beta1 * m + (1 - beta1) * g_t
         m = self.get_slot(var, "m").handle
         m_scaled_g_values = grad * (1 - beta1_t)
-        m_t = state_ops.assign(m, beta1_t * m + m_scaled_g_values, use_locking=self._use_locking)
+        m_t = state_ops.assign(
+            m, beta1_t * m + m_scaled_g_values, use_locking=self._use_locking)
 
         # v_t = beta2 * v + (1 - beta2) * (g_t * g_t)
         v = self.get_slot(var, "v").handle
         v_scaled_g_values = (grad * grad) * (1 - beta2_t)
-        v_t = state_ops.assign(v, beta2_t * v + v_scaled_g_values, use_locking=self._use_locking)
+        v_t = state_ops.assign(
+            v, beta2_t * v + v_scaled_g_values, use_locking=self._use_locking)
 
         # amsgrad
         vhat = self.get_slot(var, "vhat").handle
         vhat_t = state_ops.assign(vhat, math_ops.maximum(v_t, vhat))
         v_sqrt = math_ops.sqrt(vhat_t)
 
-        var_update = state_ops.assign_sub(var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
+        var_update = state_ops.assign_sub(
+            var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
         return control_flow_ops.group(*[var_update, m_t, v_t, vhat_t])
 
     def _apply_sparse_shared(self, grad, var, indices, scatter_add):
@@ -136,7 +147,8 @@ class AMSGrad(optimizer.Optimizer):
         vhat = self.get_slot(var, "vhat")
         vhat_t = state_ops.assign(vhat, math_ops.maximum(v_t, vhat))
         v_sqrt = math_ops.sqrt(vhat_t)
-        var_update = state_ops.assign_sub(var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
+        var_update = state_ops.assign_sub(
+            var, lr * m_t / (v_sqrt + epsilon_t), use_locking=self._use_locking)
         return control_flow_ops.group(*[var_update, m_t, v_t, vhat_t])
 
     def _apply_sparse(self, grad, var):

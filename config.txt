@@ -12,10 +12,10 @@
 --grimme_a1=0.0
 --grimme_a2=6.0519
 --dataset=sn2_reactions.npz
---num_train=400000
---num_valid=5000
+--num_train=40000
+--num_valid=500
 --seed=42
---max_steps=10000000
+--max_steps=5000
 --learning_rate=0.001
 --max_norm=1000.0
 --ema_decay=0.999
@@ -29,7 +29,7 @@
 --force_weight=52.91772105638412
 --charge_weight=14.399645351950548
 --dipole_weight=27.211386024367243
---summary_interval=10000
---validation_interval=10000
---save_interval=10000
+--summary_interval=1000
+--validation_interval=1000
+--save_interval=1000
 --record_run_metadata=0

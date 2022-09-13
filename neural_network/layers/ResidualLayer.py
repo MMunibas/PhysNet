@@ -3,6 +3,7 @@ import numpy as np
 from .NeuronLayer import *
 from .DenseLayer import *
 
+
 class ResidualLayer(NeuronLayer):
     def __str__(self):
         return "residual_layer"+super().__str__()
@@ -11,26 +12,29 @@ class ResidualLayer(NeuronLayer):
         super().__init__(n_in, n_out, activation_fn)
         self._keep_prob = keep_prob
         with tf.variable_scope(scope):
-            self._dense    = DenseLayer(n_in,  n_out, activation_fn=activation_fn, 
-                W_init=W_init, b_init=b_init, use_bias=use_bias, seed=seed, scope="dense", dtype=dtype)
-            self._residual = DenseLayer(n_out, n_out, activation_fn=None, 
-                W_init=W_init, b_init=b_init, use_bias=use_bias, seed=seed, scope="residual", dtype=dtype)
-      
+            self._dense = DenseLayer(n_in,  n_out, activation_fn=activation_fn,
+                                     W_init=W_init, b_init=b_init, use_bias=use_bias, seed=seed, scope="dense", dtype=dtype)
+            self._residual = DenseLayer(n_out, n_out, activation_fn=None,
+                                        W_init=W_init, b_init=b_init, use_bias=use_bias, seed=seed, scope="residual", dtype=dtype)
+
     @property
     def keep_prob(self):
+        '''keep_prob getter'''
         return self._keep_prob
 
     @property
     def dense(self):
+        '''dense getter'''
         return self._dense
 
     @property
     def residual(self):
+        '''residual getter'''
         return self._residual
 
     def __call__(self, x):
-        #pre-activation
-        if self.activation_fn is not None: 
+        # pre-activation
+        if self.activation_fn is not None:
             y = tf.nn.dropout(self.activation_fn(x), self.keep_prob)
         else:
             y = tf.nn.dropout(x, self.keep_prob)
